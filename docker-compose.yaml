@@ -1,0 +1,51 @@
+version: "2.1"
+services:
+  deluge:
+    image: ghcr.io/linuxserver/deluge
+    container_name: deluge
+    environment:
+      - PUID=${PGUID}
+      - PGID=${PGID}
+      - TZ=${TIME_ZONE}
+      #- DELUGE_LOGLEVEL=error
+    volumes:
+      - ${DELUGE_CONFIG}:/config
+      - ${DELUGE_DOWNLOADS}:/downloads
+    ports:
+      - "80:8112"
+    restart: always 
+  samba:
+    image: dperson/samba
+    container_name: samba
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139"
+      - "445:445"
+    restart: always 
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
+    volumes:
+      - ${SAMBA_SHARE}:/mnt
+    environment:
+      - USERID=${PGUID}
+      - GROUPID=${PGID}
+      - TZ=${TIME_ZONE}
+      - WORKGROUP=WORKGROUP  
+      - USER=test;test  
+      - RECYCLE=false  
+      - SHARE=${SAMBA_SHARE_NAME};/mnt;yes;no;yes;;
+  minidlna:
+    image: vladgh/minidlna
+    container_name: minidlna
+    network_mode: host
+    restart: always 
+    volumes:
+      - ${MINIDLNA_SHARE}:/media
+    environment:
+      - MINIDLNA_MEDIA_DIR=/media
+      - MINIDLNA_FRIENDLY_NAME=${MINIDLNA_NAME}
+      - PUID=${PGUID}
+      - PGID=${PGID}
