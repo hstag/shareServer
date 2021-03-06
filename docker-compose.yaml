@@ -1,19 +1,5 @@
 version: "2.1"
 services:
-  deluge:
-    image: ghcr.io/linuxserver/deluge
-    container_name: deluge
-    environment:
-      - PUID=${PGUID}
-      - PGID=${PGID}
-      - TZ=${TIME_ZONE}
-      #- DELUGE_LOGLEVEL=error
-    volumes:
-      - ${DELUGE_CONFIG}:/config
-      - ${DELUGE_DOWNLOADS}:/downloads
-    ports:
-      - "80:8112"
-    restart: always 
   samba:
     image: dperson/samba
     container_name: samba
@@ -49,3 +35,19 @@ services:
       - MINIDLNA_FRIENDLY_NAME=${MINIDLNA_NAME}
       - PUID=${PGUID}
       - PGID=${PGID}
+  qbittorrent:
+    image: ghcr.io/linuxserver/qbittorrent:arm32v7-version-14.3.3.99202101191832-7248-da0b276d5ubuntu18.04.1
+    container_name: qbittorrent
+    environment:
+      - PUID=${PGUID}
+      - PGID=${PGID}
+      - TZ=${TIME_ZONE}
+      - WEBUI_PORT=8080
+    volumes:
+      - ${QB_CONFIG}:/config
+      - ${QB_DOWNLOADS}:/downloads
+    ports:
+      - 6881:6881
+      - 6881:6881/udp
+      - 80:8080
+    restart: always
